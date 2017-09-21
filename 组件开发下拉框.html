@@ -23,8 +23,21 @@
 			for(var arr in parent){
 				son[arr]=parent[arr];
 			}
-		}
-		
+		}	
+		//绑定事件
+		function bind(obj,event,fn){
+				obj.listEvents = obj.listEvents || {};//obj.listEvents ={};
+				obj.listEvents[event]=obj.listEvents[event]|| [];//obj.listEvents={user:[]}
+				obj.listEvents[event].push(fn);//obj.listEvents={user:[fn1,fn2]};
+				
+				if(obj.addEventListener){
+					obj.addEventListener(event,fn,false);
+				}else{
+					obj.attachEvent('on'+event,function(){
+						fn.call(obj)//apply([122333])
+					})
+				}
+			};
 		  
 		function Select(){
 			this.default={
@@ -63,14 +76,8 @@
 				ev.cancelBubble=true;
 			};
 			
-//		       if(document.addEventListener){
-//					document.addEventListener('click',_this.documentDis,false);
-//				}else{
-//					document.attachEvent('onclick',_this.documentDis)
-//			     }
-			document.onclick=function(){
-				_this.documentDis();
-		     };
+		    bind(document,'click',function(){_this.documentDis(_this)});//点击其他部分选项框收回
+			
 		    for(var i=0;i<this.default.data.length;i++){
 		    	_this.aLi[i].index=i;
 		    	_this.aLi[i].onclick=function(){
@@ -84,16 +91,16 @@
 		
 		Select.prototype.display=function(){
 			if(this.off){
-					startMove(this.oSelect,{'height':(this.default.data.length+1)*31});
+				 this.oSelect.style.height=(this.default.data.length+1)*31+"px";
 					this.off=false;
 				}else{
-					startMove(this.oSelect,{'height':32});
+					this.oSelect.style.height='32px';
 					this.off=true;
 				}
 		};
 		
-		Select.prototype.documentDis=function(){
-			startMove(this.oSelect,{'height':32});
+		Select.prototype.documentDis=function(_this){
+			 _this.oSelect.style.height='32px';
 				this.off=true;
 		};
 		Select.prototype.liDisplay=function(it){
